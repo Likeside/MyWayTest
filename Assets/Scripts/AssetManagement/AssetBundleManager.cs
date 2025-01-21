@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AssetBundleBrowser.Game;
 using UnityEngine;
 using Zenject;
 using Object = UnityEngine.Object;
@@ -12,6 +11,7 @@ namespace AssetBundleBrowser.AssetManagement
     public interface IAssetBundleManager: IInitializable
     {
         void GetAsset<T> (AssetBundleType assetBundleType, string assetName, Action<bool,T> loadedCallback) where T : Object;
+        void UpdateBundle(AssetBundleType assetBundleType, Action<bool> updatedCallback);
     }
     
     public class AssetBundleManager: IAssetBundleManager
@@ -41,6 +41,22 @@ namespace AssetBundleBrowser.AssetManagement
             }
             var asset = _assetBundles[assetBundleType].LoadAsset<T>(assetName);
             loadedCallback.Invoke(asset != null, asset);
+        }
+        public void UpdateBundle(AssetBundleType assetBundleType, Action<bool> updatedCallback)
+        {
+            var assetBundle = AssetBundle.LoadFromFile(Path.Combine(Application.streamingAssetsPath, assetBundleType.ToString().ToLower()));
+            if (assetBundle == null)
+            {
+                updatedCallback.Invoke(false);
+                return;
+            } 
+            if (_assetBundles.ContainsKey(assetBundleType))
+            {
+                _assetBundles[assetBundleType].Unload(true);
+                _assetBundles.Remove(assetBundleType);
+            }
+            _assetBundles.Add(assetBundleType, assetBundle);
+            updatedCallback.Invoke(true);
         }
     }
 }

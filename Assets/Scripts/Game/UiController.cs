@@ -24,6 +24,7 @@ namespace AssetBundleBrowser.Game
         {
              _assetBundleManager.GetAsset<Sprite>(AssetBundleType.Images, "buttonBackground.png", SetSprite);
         }
+        
         private void SetSprite(bool loaded, Sprite sprite)
         {
             if (loaded)

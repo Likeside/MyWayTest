@@ -55,26 +55,6 @@ namespace AssetManagement
             _persisting = false;
         }
 
-        public async void SaveAsync()
-        {
-            if (_persisting) return;
-            _persisting = true;
-            using (var streamWriter = new StreamWriter(_fileLocation, false))
-            {
-                try
-                {
-                    var json = JsonConvert.SerializeObject(Data);
-                    await streamWriter.WriteAsync(json);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                }
-            }
-
-            _persisting = false;
-        }
-
         public bool TryLoadData()
         {
             if (!File.Exists(_fileLocation))
@@ -82,7 +62,6 @@ namespace AssetManagement
                 Debug.Log($"No such file in the location: {_fileLocation}, your script should create default data and call Save(); in this case");
                 return false;
             }
-
             try
             {
                 var json = File.ReadAllText(_fileLocation);
@@ -97,24 +76,10 @@ namespace AssetManagement
             }
         }
 
-        public async Task<bool> TryLoadDataAsync()
-        {
-            if (!File.Exists(_fileLocation))
-            {
-                Debug.Log($"No such file in the location: {_fileLocation}, your script should create default data and call Save(); in this case");
-                return false;
-            }
-
-            var json = await ReadTextAsync(_fileLocation);
-            if (string.IsNullOrEmpty(json) || string.IsNullOrWhiteSpace(json)) return false;
-            Data = await Task.Run(() => JsonConvert.DeserializeObject<T>(json));
-            return true;
-        }
-
         private async Task<string> ReadTextAsync(string filePath)
         {
-            using (var sr = File.OpenText(filePath))
-                return await sr.ReadToEndAsync();
+            using var sr = File.OpenText(filePath);
+            return await sr.ReadToEndAsync();
         }
     }
 }

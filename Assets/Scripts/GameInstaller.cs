@@ -1,4 +1,5 @@
 using AssetBundleBrowser.Game;
+using AssetManagement;
 using UnityEngine;
 using Zenject;
 
@@ -12,6 +13,8 @@ namespace AssetBundleBrowser
         {
             Container.BindInterfacesAndSelfTo<UiHolder>().FromInstance(uiHolder);
             Container.BindInterfacesAndSelfTo<UiController>().AsSingle();
+            Container.BindInterfacesAndSelfTo<SettingsDataLoader>().AsSingle();
+            Container.BindInterfacesAndSelfTo<GreetingsDataLoader>().AsSingle();
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using AssetManagement;
 using UnityEngine;
 using Utilities;
@@ -20,6 +21,9 @@ namespace AssetBundleBrowser.AssetManagement
         private readonly WaitingView _waitingView;
         private readonly IConfig _config;
         private readonly Dictionary<AssetBundleType, AssetBundle> _assetBundles = new Dictionary<AssetBundleType, AssetBundle>();
+
+        private int _assetBundleTypesCount;
+        private int _loadedCount;
         
         public AssetBundleManager(WaitingView waitingView, IConfig config)
         {
@@ -28,7 +32,19 @@ namespace AssetBundleBrowser.AssetManagement
         }
         public void Initialize()
         {
-            
+            var assetBundleTypes = Enum.GetValues(typeof(AssetBundleType)).Cast<AssetBundleType>().ToList();
+            _assetBundleTypesCount = assetBundleTypes.Count();
+            foreach (var assetBundleType in assetBundleTypes)
+            {
+                UpdateBundle(assetBundleType, _ =>
+                {
+                    _loadedCount++;
+                    if (_loadedCount == _assetBundleTypesCount)
+                    {
+                        Debug.Log("All asset bundles loaded");
+                    }
+                });
+            }
         }
         public void GetAsset<T>(AssetBundleType assetBundleType, string assetName, Action<bool, T> loadedCallback) where T : Object
         {

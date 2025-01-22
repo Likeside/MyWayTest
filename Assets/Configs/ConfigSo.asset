@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: ConfigSo
   m_EditorClassIdentifier: 
   remoteBundleUrl: https://www.how2visa.ru/bundles/
+  spriteBackgroundName: buttonBackground.png

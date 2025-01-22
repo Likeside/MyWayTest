@@ -15,6 +15,7 @@ namespace AssetBundleBrowser
             Container.BindInterfacesAndSelfTo<UiController>().AsSingle();
             Container.BindInterfacesAndSelfTo<SettingsDataLoader>().AsSingle();
             Container.BindInterfacesAndSelfTo<GreetingsDataLoader>().AsSingle();
+            Container.BindInterfacesAndSelfTo<SettingsDataSaver>().AsSingle();
         }
     }
 }

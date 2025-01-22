@@ -99,7 +99,6 @@ namespace Game
                 _settingsDataSaver.Data.StartingNumber = _counter;
                 _settingsDataSaver.Save();
             }
-            
         }
         private void Increment()
         {       

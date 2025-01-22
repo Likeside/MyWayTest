@@ -2,15 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using AssetManagement;
+using Game;
 using UnityEngine;
-using Utilities;
+using UnityEngine.Networking;
+using Utils;
 using Zenject;
 using Object = UnityEngine.Object;
 
-namespace AssetBundleBrowser.AssetManagement
+namespace AssetManagement
 {
-    public interface IAssetBundleManager: IInitializable
+    public interface IAssetBundleManager: IInitializable, ILoading
     {
         void GetAsset<T> (AssetBundleType assetBundleType, string assetName, Action<bool,T> loadedCallback) where T : Object;
         void UpdateBundle(AssetBundleType assetBundleType, Action<bool> updatedCallback);
@@ -18,20 +19,23 @@ namespace AssetBundleBrowser.AssetManagement
     
     public class AssetBundleManager: IAssetBundleManager
     {
-        private readonly WaitingView _waitingView;
+        private readonly IWaitingView _waitingView;
         private readonly IConfig _config;
         private readonly Dictionary<AssetBundleType, AssetBundle> _assetBundles = new Dictionary<AssetBundleType, AssetBundle>();
 
         private int _assetBundleTypesCount;
         private int _loadedCount;
-        
-        public AssetBundleManager(WaitingView waitingView, IConfig config)
+
+        public bool Loaded { get; private set; }
+        public AssetBundleManager(IWaitingView waitingView, IConfig config)
         {
             _waitingView = waitingView;
             _config = config;
         }
         public void Initialize()
         {
+          //  AssetBundle.UnloadAllAssetBundles(true);
+          //  return;
             var assetBundleTypes = Enum.GetValues(typeof(AssetBundleType)).Cast<AssetBundleType>().ToList();
             _assetBundleTypesCount = assetBundleTypes.Count();
             foreach (var assetBundleType in assetBundleTypes)
@@ -41,7 +45,7 @@ namespace AssetBundleBrowser.AssetManagement
                     _loadedCount++;
                     if (_loadedCount == _assetBundleTypesCount)
                     {
-                        Debug.Log("All asset bundles loaded");
+                        Loaded = true;
                     }
                 });
             }
@@ -77,26 +81,40 @@ namespace AssetBundleBrowser.AssetManagement
                     updatedCallback.Invoke(false);
                     return;
                 }
-                if (_assetBundles.ContainsKey(assetBundleType))
-                {
-                    _assetBundles[assetBundleType].Unload(true);
-                    _assetBundles.Remove(assetBundleType);
-                }
                 _assetBundles.Add(assetBundleType, assetBundle);
                 updatedCallback.Invoke(true);
-            }));
+            }, true));
         }
 
-        private IEnumerator LoadRemoteBundle(AssetBundleType assetBundleType,  Action<AssetBundle> loadedCallback)
+        private IEnumerator LoadRemoteBundle(AssetBundleType assetBundleType,  Action<AssetBundle> loadedCallback, bool forceUpdate = false)
         {
-            using var web = new WWW($"{_config.RemoteBundleUrl}{assetBundleType.ToString().ToLower()}" + ".unity3d");
-            yield return web;
-            AssetBundle remoteAssetBundle = web.assetBundle;
-            if (remoteAssetBundle == null) {
-                Debug.LogError("Failed to download AssetBundle!");
+            AssetBundle existingBundle = AssetBundle.GetAllLoadedAssetBundles()
+                .FirstOrDefault(bundle => bundle.name == assetBundleType.ToString().ToLower());
+            if (existingBundle != null)
+            {
+                if (forceUpdate)
+                {
+                    if (_assetBundles.ContainsKey(assetBundleType))
+                    {
+                        _assetBundles.Remove(assetBundleType);
+                    }
+                    existingBundle.Unload(true);
+                }
+                else
+                {
+                    loadedCallback?.Invoke(existingBundle);
+                    yield break;
+                }
+            }
+            UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle($"{_config.RemoteBundleUrl}{assetBundleType.ToString().ToLower()}" + ".unity3d");
+            yield return www.SendWebRequest();
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError("Error loading AssetBundle: " + www.error);
                 yield break;
             }
-            loadedCallback?.Invoke(remoteAssetBundle);
+            AssetBundle assetBundle = DownloadHandlerAssetBundle.GetContent(www);
+            loadedCallback?.Invoke(assetBundle);
         }
     }
 }

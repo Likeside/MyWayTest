@@ -6,6 +6,7 @@ namespace AssetManagement
     {
         string RemoteBundleUrl { get; }
         string SpriteBackgroundName { get; }
+        float LoadingScreenDelay { get; }
     }
     
     [CreateAssetMenu(fileName = "ConfigSo", menuName = "ConfigSo")]
@@ -13,7 +14,9 @@ namespace AssetManagement
     {
         [SerializeField] private string remoteBundleUrl;
         [SerializeField] private string spriteBackgroundName;
+        [SerializeField] private float loadingScreenDelay;
         public string RemoteBundleUrl => remoteBundleUrl;
         public string SpriteBackgroundName => spriteBackgroundName;
+        public float LoadingScreenDelay => loadingScreenDelay;
     }
 }

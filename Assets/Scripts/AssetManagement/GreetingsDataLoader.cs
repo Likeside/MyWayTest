@@ -1,6 +1,8 @@
+using Zenject;
+
 namespace AssetManagement
 {
-    public interface IGreetingsDataLoader<T> where T : IJsonData
+    public interface IGreetingsDataLoader<T>: IInitializable where T : IJsonData 
     {
         public T Data { get; set; }
         void Save();

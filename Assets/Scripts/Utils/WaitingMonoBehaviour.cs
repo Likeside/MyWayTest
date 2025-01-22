@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using UnityEngine;
-namespace Utilities
+
+namespace Utils
 {
-    public interface WaitingView
+    public interface IWaitingView
     {
         Coroutine StartCoroutine(IEnumerator enumerator);
         void StopCoroutine(Coroutine coroutine);
@@ -11,7 +12,7 @@ namespace Utilities
         Coroutine ExecuteLoopInSeconds(float seconds, int count, Action action, float delay = 0f);
     }
 
-    public sealed class WaitingMonoBehaviour : MonoBehaviour, WaitingView
+    public sealed class WaitingMonoBehaviour : MonoBehaviour, IWaitingView
     {
         public new void StopCoroutine(Coroutine coroutine)
         {

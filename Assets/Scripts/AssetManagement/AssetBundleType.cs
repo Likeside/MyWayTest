@@ -1,4 +1,4 @@
-namespace AssetBundleBrowser.AssetManagement
+namespace AssetManagement
 {
     public enum AssetBundleType
     {

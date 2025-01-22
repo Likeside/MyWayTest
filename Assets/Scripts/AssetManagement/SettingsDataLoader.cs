@@ -1,6 +1,8 @@
+using Zenject;
+
 namespace AssetManagement
 {
-    public interface ISettingsDataLoader<T> where T : IJsonData
+    public interface ISettingsDataLoader<T>: IInitializable where T : IJsonData
     {
         public T Data { get; set; }
         void Save();

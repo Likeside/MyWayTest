@@ -34,8 +34,6 @@ namespace AssetManagement
         }
         public void Initialize()
         {
-          //  AssetBundle.UnloadAllAssetBundles(true);
-          //  return;
             var assetBundleTypes = Enum.GetValues(typeof(AssetBundleType)).Cast<AssetBundleType>().ToList();
             _assetBundleTypesCount = assetBundleTypes.Count();
             foreach (var assetBundleType in assetBundleTypes)

@@ -20,7 +20,6 @@ namespace Game
         private readonly IConfig _config;
         private readonly IWaitingView _waitingView;
         private int _counter;
-        
         public bool Loaded { get; private set; }
         
         public UiController(IUiHolder uiHolder,

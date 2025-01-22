@@ -1,6 +1,7 @@
 using AssetBundleBrowser.AssetManagement;
 using AssetManagement;
 using UnityEngine;
+using Utilities;
 using Zenject;
 
 namespace AssetBundleBrowser.Game
@@ -32,6 +33,7 @@ namespace AssetBundleBrowser.Game
         {
              _assetBundleManager.GetAsset<Sprite>(AssetBundleType.Images, "buttonBackground.png", SetSprite);
         }
+        
         private void SetSprite(bool loaded, Sprite sprite)
         {
             if (loaded)

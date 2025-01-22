@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   remoteBundleUrl: https://www.how2visa.ru/bundles/
   spriteBackgroundName: buttonBackground.png
+  loadingScreenDelay: 3
